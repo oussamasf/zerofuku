@@ -1,2 +1,4 @@
 .vscode 
 server.dSYM
+sandbox.c
+*.out
