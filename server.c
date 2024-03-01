@@ -7,12 +7,13 @@
 
 void handle_request(int client_socket)
 {
-  char request[1024];
-  int bytes_received = recv(client_socket, request, 1024, 0);
+  char request[2048];
+  int bytes_received = recv(client_socket, request, 2048, 0);
 
   if (bytes_received > 0)
   {
-    if (strncmp(request, "GET /", 4) == 0)
+    // Handle GET request
+    if (strncmp(request, "GET /", 5) == 0)
     {
       char response[] = "HTTP/1.1 200 OK\r\n"
                         "Content-Type: text/plain\r\n"
@@ -21,6 +22,42 @@ void handle_request(int client_socket)
                         "\r\n"
                         "Hello from the HTTP server!\n";
       send(client_socket, response, strlen(response), 0);
+    }
+    // Handle POST request
+    else if (strncmp(request, "POST /", 6) == 0)
+    {
+      // Assuming the request body is immediately after the headers and a blank line
+      char *body = strstr(request, "\r\n\r\n");
+      if (body)
+      {
+        body += 4; // Move past the "\r\n\r\n"
+                   // Here you can process the body content as needed
+      }
+      else
+      {
+        body = ""; // No body found, default to empty string
+      }
+
+      char header[] = "HTTP/1.1 200 OK\r\n"
+                      "Content-Type: text/plain\r\n"
+                      "\r\n";
+      // Calculate total response size
+      size_t response_size = strlen(header) + strlen(body) + 1; // +1 for null-terminator
+      char *response = (char *)malloc(response_size);
+
+      if (response)
+      {
+        // Construct response with body content
+        snprintf(response, response_size, "%s%s", header, body);
+        send(client_socket, response, strlen(response), 0);
+        free(response);
+      }
+      else
+      {
+        // Failed to allocate memory for response
+        char error_response[] = "HTTP/1.1 500 Internal Server Error\r\n\r\n";
+        send(client_socket, error_response, strlen(error_response), 0);
+      }
     }
     else
     {
