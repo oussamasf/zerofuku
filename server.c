@@ -12,10 +12,14 @@ void handle_request(int client_socket)
 
   if (bytes_received > 0)
   {
-
     if (strncmp(request, "GET /", 4) == 0)
     {
-      char response[] = "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nHello from the HTTP server!\n";
+      char response[] = "HTTP/1.1 200 OK\r\n"
+                        "Content-Type: text/plain\r\n"
+                        "Some-header: ousf/ousf\r\n"
+                        "X-Custom-Header: CustomValue\r\n"
+                        "\r\n"
+                        "Hello from the HTTP server!\n";
       send(client_socket, response, strlen(response), 0);
     }
     else
