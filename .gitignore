@@ -2,3 +2,4 @@
 server.dSYM
 sandbox.c
 *.out
+http-server
